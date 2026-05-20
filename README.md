@@ -1,77 +1,115 @@
 # GAN-Reviews: Сравнительный анализ генеративных моделей для текстовых отзывов
 
-Финальный проект по дисциплине **Generative Adversarial Networks (GANs)** (магистратура).
+Финальный проект по дисциплине **Generative Adversarial Networks** (магистратура).
 
-## Цель проекта
+> Если ты AI-ассистент на новом ПК — **сначала прочитай [HANDOFF.md](HANDOFF.md)**.
 
-Исследовать границы применимости GAN для генерации текстовых данных в low-resource setting на примере отзывов о товарах с Kaspi.kz:
+---
 
-1. **Эмбеддинг-уровень (непрерывное пространство):** обучить и сравнить WGAN-GP и VAE на 768-мерных векторах XLM-RoBERTa, оценить близость распределений сгенерированных и реальных эмбеддингов.
-2. **Токен-уровень (дискретное пространство):** обучить Transformer-based текстовый GAN с Gumbel-Softmax для прямой генерации отзывов, проанализировать качество и провалы.
+## Идея проекта
 
-Главный исследовательский вопрос: **где проходит граница применимости GAN для текста — на уровне эмбеддингов или на уровне токенов?**
+Исследовать границы применимости GAN для генерации текстовых данных на примере
+отзывов о товарах с Kaspi.kz.
 
-## Структура проекта
+**Главный вопрос:** где проходит граница применимости GAN — на уровне
+эмбеддингов (непрерывное пространство) или на уровне токенов (дискретное)?
+
+**Подход:**
+
+| Уровень | Модель | Чем сравниваем |
+|---------|--------|----------------|
+| Эмбеддинги (768-dim XLM-R) | **WGAN-GP** | Основная модель |
+| Эмбеддинги | **VAE** | Бейзлайн другого семейства |
+| Токены (текст) | **Text-GAN** (Gumbel-Softmax) | Демонстрация ограничений |
+
+---
+
+## Структура
 
 ```
 gan-reviews/
-├── data/
-│   ├── raw/                  # JSONL с сырыми отзывами (после парсинга)
-│   ├── processed/            # отфильтрованные, дедуплицированные
-│   └── embeddings/           # .npy матрицы (N, 768) + labels
-├── parser/                   # парсер Kaspi.kz
-├── embeddings/               # извлечение XLM-R эмбеддингов
-├── models/
-│   ├── wgan_gp_embeddings.py
-│   ├── vae_embeddings.py
-│   └── text_gan/             # Transformer + Gumbel-Softmax
-├── experiments/              # сравнение моделей, гиперпараметры
-├── metrics/                  # MMD, Frechet distance, BLEU, perplexity
-├── visualizations/           # t-SNE, loss curves
-├── notebooks/                # финальная демонстрация
-├── checkpoints/              # сохранённые модели
-├── results/                  # графики, таблицы
-└── report/                   # отчёт 15–20 страниц
+├── HANDOFF.md                    ← для AI на новом ПК
+├── README.md
+├── docker-compose.yml
+├── docker/                       Dockerfile для parser и trainer
+├── parser/                       Сбор отзывов с Kaspi.kz
+├── embeddings/                   Извлечение XLM-R эмбеддингов
+├── models/                       WGAN-GP, VAE, Text-GAN
+├── metrics/                      MMD, Frechet Distance
+├── notebooks/                    Точки запуска (Colab-совместимые)
+├── data/                         (gitignored) сырые и обработанные данные
+├── checkpoints/                  (gitignored) сохранённые модели
+├── results/                      графики и таблицы метрик
+└── report/                       отчёт + презентация
 ```
+
+Детали — в [HANDOFF.md](HANDOFF.md).
+
+---
 
 ## Датасет
 
-5000 отзывов с Kaspi.kz, стратифицированно по 10 категориям × 500 отзывов:
+5000 отзывов с Kaspi.kz, **10 категорий × 500 отзывов**:
 
-1. Смартфоны
+1. Смартфоны и аксессуары
 2. Ноутбуки
-3. Бытовая техника (крупная)
-4. Бытовая техника (мелкая)
-5. Одежда
+3. Крупная бытовая техника
+4. Мелкая бытовая техника
+5. Одежда и обувь
 6. Косметика
 7. Продукты
 8. Детские товары
 9. Спорт
 10. Мебель
 
-Каждый отзыв содержит: текст, рейтинг (1–5), категорию, дату. Категория = условие (label) для conditional GAN, рейтинг = прокси-тональность.
+Сбор стратифицированный, по 1–5 товаров на категорию. Фильтры: 5–100 слов,
+дедуп по тексту.
+
+---
 
 ## Модели
 
-| Модель | Тип | Назначение |
-|--------|-----|------------|
-| **WGAN-GP** | GAN | Генерация эмбеддингов (768-dim), conditional на категории |
-| **VAE** | Не-GAN бейзлайн | Сравнение с WGAN-GP по тем же метрикам |
-| **Text-GAN** | GAN | Генерация текста на уровне токенов (Gumbel-Softmax) |
+### 1. WGAN-GP на эмбеддингах
+
+- **Generator:** MLP, (z=128) + label_emb → 768-dim вектор
+- **Critic:** MLP, 768 + label_emb → scalar
+- **Loss:** Wasserstein + Gradient Penalty (λ=10)
+- **Trick:** LayerNorm в critic (BatchNorm нарушает Lipschitz)
+
+### 2. Conditional VAE
+
+- **Encoder/Decoder:** MLP
+- **Latent:** 64-dim
+- **Loss:** ELBO = reconstruction (MSE) + β·KL
+
+### 3. Text-GAN (TODO)
+
+- **Generator:** маленький Transformer decoder + Gumbel-Softmax
+- **Discriminator:** LSTM или CNN
+- **Loss:** adversarial
+- **Ожидание:** будет генерировать кашу — это часть исследования
+
+---
 
 ## Метрики
 
-- **Эмбеддинг-модели:** MMD (Maximum Mean Discrepancy), Frechet Distance, downstream F1 классификатора тональности
-- **Текстовая модель:** Perplexity, BLEU, Distinct-n, human evaluation
+| Метрика | Что показывает |
+|---------|----------------|
+| **MMD** (Maximum Mean Discrepancy) | Близость распределений в пространстве признаков |
+| **Frechet Distance** | Близость через моменты (μ, Σ) — аналог FID |
+| **Per-class MMD/FD** | Где модель работает лучше/хуже |
+| **t-SNE / UMAP** | Визуальное смешивание реальных и сгенерированных точек |
 
-## Запуск через Docker (рекомендуется)
+---
+
+## Запуск через Docker
 
 Ничего не ставится в систему — всё работает в контейнерах.
 
-### Парсер Kaspi
+### Парсер Kaspi (локально)
 
 1. Заполнить [parser/urls.yaml](parser/urls.yaml) ссылками на товары по 10 категориям.
-2. Собрать образ (только при первом запуске или после правок Dockerfile):
+2. Собрать образ (первый раз или после правок Dockerfile):
    ```bash
    docker compose build parser
    ```
@@ -81,38 +119,90 @@ gan-reviews/
    ```
    Результат: `data/raw/reviews.jsonl`, чекпоинт: `data/raw/_checkpoint.json`.
 
-   Если упал/прервался — просто перезапусти команду, продолжит с чекпоинта.
+   При обрыве — просто запусти ту же команду, продолжит с чекпоинта.
 
    Сбросить и начать с нуля:
    ```bash
    docker compose run --rm parser python parser/collect.py --reset
    ```
 
-### Trainer (Jupyter Lab для моделей)
+### Trainer (опционально — для локального Jupyter)
 
-1. Собрать образ:
-   ```bash
-   docker compose build trainer
-   ```
-2. Поднять Jupyter:
-   ```bash
-   docker compose up trainer
-   ```
-3. Открыть http://localhost:8888 (без пароля и токена).
+```bash
+docker compose build trainer
+docker compose up trainer
+```
 
-### GPU
+Открыть http://localhost:8888 (без пароля).
 
-Локально на Mac GPU не нужно — модели на эмбеддингах тренируются на CPU за минуты.
-Для текстового GAN используем бесплатный Colab T4 (импортируем ноутбук).
+### Обучение моделей в Colab (рекомендуется)
 
-## Параметры обучения
+1. Запушить репо на GitHub
+2. В Colab: **File → Open notebook → GitHub** → выбрать ноутбук
+3. Запустить ячейки — первая клонирует репо, ставит зависимости
+4. После обучения: **File → Save a copy in GitHub** — outputs попадут в git
 
-Будут добавлены после первых экспериментов.
+---
+
+## Workflow
+
+```
+[parser/urls.yaml]
+        │ ручное заполнение ~200–400 URL
+        ▼
+[docker compose run --rm parser]
+        │
+        ▼
+[data/raw/reviews.jsonl]   ← 5000 отзывов
+        │
+        ▼
+[notebooks/01_explore_data.ipynb]   ← EDA: длины, языки, рейтинги
+        │
+        ▼
+[notebooks/02_extract_embeddings.ipynb]   ← XLM-R на T4
+        │
+        ▼
+[data/embeddings/{X_cls,X_mean,labels,ratings}.npy]
+        │
+        ├──► [notebooks/03_train_wgan_gp.ipynb]   → checkpoints/wgan_gp.pth
+        ├──► [notebooks/04_train_vae.ipynb]        → checkpoints/vae.pth
+        └──► [notebooks/06_train_text_gan.ipynb]   → checkpoints/text_gan.pth
+                │
+                ▼
+        [notebooks/05_compare_models.ipynb]   ← MMD, FD, t-SNE
+                │
+                ▼
+        [notebooks/07_final_demo.ipynb]   ← end-to-end для защиты
+                │
+                ▼
+        [report/report.md → report.docx]
+```
+
+---
+
+## Параметры обучения (defaults)
+
+| Параметр | Значение | Где задано |
+|----------|----------|-----------|
+| z_dim (WGAN-GP) | 128 | `models/wgan_gp.py` |
+| hidden | 512 | `models/wgan_gp.py`, `models/vae.py` |
+| n_critic | 5 | `models/wgan_gp.py` |
+| lambda_gp | 10.0 | `models/wgan_gp.py` |
+| Adam betas | (0.5, 0.9) | `models/wgan_gp.py` |
+| lr | 1e-4 (GAN) / 1e-3 (VAE) | `models/*.py` |
+| batch_size | 64 | в ноутбуках |
+| n_epochs | 200 (GAN) / 100 (VAE) | в ноутбуках |
+| latent_dim (VAE) | 64 | `models/vae.py` |
+| β (VAE) | 1.0 | `models/vae.py` |
+
+---
 
 ## Результаты
 
 Будут добавлены после Final-этапа.
 
-## Автор
+---
 
-Sultan Khassenov, магистратура, AITU.
+## Лицензия и автор
+
+Sultan Khassenov, магистратура AITU.
