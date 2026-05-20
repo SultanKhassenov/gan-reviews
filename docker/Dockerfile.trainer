@@ -1,0 +1,27 @@
+# Trainer: PyTorch + transformers для обучения GAN/VAE и Jupyter.
+# Использовать на T4 в Colab (импорт ноутбуков) или локально на CPU/GPU.
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements-trainer.txt /app/requirements-trainer.txt
+RUN pip install --no-cache-dir -r /app/requirements-trainer.txt
+
+COPY embeddings/ /app/embeddings/
+COPY models/ /app/models/
+COPY metrics/ /app/metrics/
+COPY visualizations/ /app/visualizations/
+COPY experiments/ /app/experiments/
+COPY notebooks/ /app/notebooks/
+
+EXPOSE 8888
+
+# По умолчанию — Jupyter без токена, доступен на :8888
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", \
+     "--allow-root", "--NotebookApp.token=", "--NotebookApp.password="]

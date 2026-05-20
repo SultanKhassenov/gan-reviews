@@ -1,0 +1,15 @@
+# Не копируем в образ — монтируется как volume
+data/
+checkpoints/
+results/
+venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+.DS_Store
+.idea/
+.vscode/
+notebooks/.ipynb_checkpoints/
+report/
+*.log

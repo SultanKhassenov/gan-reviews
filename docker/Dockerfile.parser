@@ -1,0 +1,23 @@
+# Парсер Kaspi.kz: Python + Playwright + Chromium
+# Базовый образ Microsoft Playwright уже содержит браузер и все системные либы,
+# нужно только доустановить pip-пакеты.
+
+FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
+
+WORKDIR /app
+
+# Сначала только requirements — для кэширования слоя зависимостей
+COPY requirements-parser.txt /app/requirements-parser.txt
+RUN pip install --no-cache-dir -r /app/requirements-parser.txt \
+    && playwright install chromium
+
+# Код парсера копируется при сборке (мелочь — обновится при rebuild)
+COPY parser/ /app/parser/
+
+# Данные и чекпоинты будут смонтированы как volumes
+RUN mkdir -p /app/data/raw
+
+# По умолчанию запускаем оркестратор
+CMD ["python", "-u", "parser/collect.py", \
+     "--urls", "parser/urls.yaml", \
+     "--out", "data/raw/reviews.jsonl"]

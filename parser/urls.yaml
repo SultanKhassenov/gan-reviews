@@ -1,0 +1,60 @@
+# Шаблон для ручного сбора URL товаров с Kaspi.kz
+#
+# Правила:
+# - 10 категорий, цель: ~500 отзывов на категорию
+# - URL должен быть на карточку товара: https://kaspi.kz/shop/p/...
+# - Можешь добавлять любое количество URL — парсер сам остановится при достижении 500
+# - Если категория недобрала 500, парсер пометит в логе и попросит ещё URL
+#
+# Параметры сбора (можно менять):
+#   per_product_cap: 80    # максимум отзывов с одного товара (защита от bias)
+#   per_category_target: 500
+#   min_review_words: 20
+#   max_review_words: 150
+
+config:
+  per_product_cap: 80
+  per_category_target: 500
+  min_review_words: 5
+  max_review_words: 100
+
+categories:
+
+  smartphones:
+    - https://kaspi.kz/shop/p/kabel-varium-usb-4-type-c-m-1-m-vtt03-belyi-144182006/
+    - # https://kaspi.kz/shop/p/...
+
+  laptops:
+    - # https://kaspi.kz/shop/p/...
+
+  large_appliances:
+    - # холодильники, стиральные машины
+    - # https://kaspi.kz/shop/p/...
+
+  small_appliances:
+    - # блендеры, чайники, фены
+    - # https://kaspi.kz/shop/p/...
+
+  clothing:
+    - # одежда, обувь
+    - # https://kaspi.kz/shop/p/...
+
+  cosmetics:
+    - # кремы, парфюм, уход
+    - # https://kaspi.kz/shop/p/...
+
+  food:
+    - # продукты с отзывами (если есть)
+    - # https://kaspi.kz/shop/p/...
+
+  kids:
+    - # детские товары, игрушки, коляски
+    - # https://kaspi.kz/shop/p/...
+
+  sports:
+    - # велосипеды, тренажёры, экипировка
+    - # https://kaspi.kz/shop/p/...
+
+  furniture:
+    - # диваны, столы, стулья
+    - # https://kaspi.kz/shop/p/...

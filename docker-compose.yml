@@ -1,0 +1,58 @@
+# Два сервиса:
+#   parser  — Playwright-сборщик отзывов Kaspi.kz
+#   trainer — PyTorch + Jupyter для обучения моделей
+#
+# Парсер запускается командой:
+#   docker compose run --rm parser
+#
+# Trainer (Jupyter) поднимается командой:
+#   docker compose up trainer
+# и доступен на http://localhost:8888
+
+services:
+
+  parser:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.parser
+    image: gan-reviews-parser:latest
+    container_name: gan-reviews-parser
+    working_dir: /app
+    volumes:
+      # Код парсера монтируем, чтобы правки сразу подхватывались без rebuild
+      - ./parser:/app/parser
+      # Данные и чекпоинты сохраняются на хосте
+      - ./data:/app/data
+    # Сетка нужна — парсим живой сайт
+    network_mode: bridge
+    # Не запускается автоматически — только через `docker compose run`
+    profiles: ["manual"]
+
+  trainer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.trainer
+    image: gan-reviews-trainer:latest
+    container_name: gan-reviews-trainer
+    working_dir: /app
+    volumes:
+      - ./embeddings:/app/embeddings
+      - ./models:/app/models
+      - ./metrics:/app/metrics
+      - ./visualizations:/app/visualizations
+      - ./experiments:/app/experiments
+      - ./notebooks:/app/notebooks
+      - ./data:/app/data
+      - ./checkpoints:/app/checkpoints
+      - ./results:/app/results
+    ports:
+      - "8888:8888"
+    profiles: ["manual"]
+    # Раскомментируй для GPU (NVIDIA Container Toolkit на хосте):
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]

@@ -1,0 +1,26 @@
+# Зависимости для обучения моделей (без Playwright)
+pandas==2.2.3
+numpy==1.26.4
+scikit-learn==1.5.2
+
+# DL stack
+torch==2.5.1
+transformers==4.46.3
+sentencepiece==0.2.0
+einops==0.8.0
+
+# Метрики и наука
+scipy==1.14.1
+
+# Визуализация
+matplotlib==3.9.2
+seaborn==0.13.2
+umap-learn==0.5.7
+
+# Jupyter
+jupyterlab==4.3.4
+ipykernel==6.29.5
+
+# Utils
+pyyaml==6.0.2
+tqdm==4.67.1
