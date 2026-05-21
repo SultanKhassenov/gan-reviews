@@ -1,208 +1,48 @@
-# GAN-Reviews: Сравнительный анализ генеративных моделей для текстовых отзывов
+# Сравнительный анализ генеративных моделей для текстовых отзывов
 
-Финальный проект по дисциплине **Generative Adversarial Networks** (магистратура).
+## 1. Название проекта
+**Generative Adversarial Networks (GANs) for Text-based Reviews in Low-Resource Settings.**  
+*(Сравнительный анализ WGAN-GP, VAE и Text-GAN для синтеза мультиязычных отзывов)*.
 
-> Если ты AI-ассистент на новом ПК — **сначала прочитай [HANDOFF.md](HANDOFF.md)**.
+## 2. Цель проекта
+Разработать и обучить генеративную модель для решения задачи аугментации (генерации) текстовых данных в условиях малого объема обучающей выборки (3500 отзывов) и смешения языков (Code-switching: Русский/Казахский). Главная цель — доказать неэффективность прямой генерации дискретных токенов и продемонстрировать стабильность пайплайна **Continuous Latent Space Generation**.
 
----
+## 3. Описание архитектуры GAN
+В рамках проекта исследованы три архитектуры:
+1. **Conditional WGAN-GP (Основная модель):** Генерация непрерывных 768-мерных семантических эмбеддингов. Использует метрику Вассерштейна (EMD) и Gradient Penalty для стабильности Критика (вместо weight clipping).
+2. **Conditional VAE:** Вероятностный бейзлайн (Reconstruction Loss + KL Divergence).
+3. **Text-GAN (Дискретный подход):** Экспериментальная модель (GRU + 1D CNN) с использованием трюка непрерывной релаксации (Gumbel-Softmax). Показала моментальный Mode Collapse.
 
-## Идея проекта
+**Метод декодирования:** Retrieval Decoding (алгоритм $K$-Nearest Neighbors) внутри заданных товарных категорий для перевода сгенерированных 768-dim векторов в человекочитаемый текст.
 
-Исследовать границы применимости GAN для генерации текстовых данных на примере
-отзывов о товарах с Kaspi.kz.
+## 4. Используемый датасет
+- **Источник:** Спарсенные данные с маркетплейса Kaspi.kz (через кастомный скрипт на Playwright).
+- **Объем:** 3588 отфильтрованных и уникальных отзывов.
+- **Распределение:** 10 сбалансированных классов товаров (smartphones, appliances, clothing и др.).
+- **Векторизация:** Эмбеддинги получены через мультиязычный энкодер `paraphrase-multilingual-mpnet-base-v2` (Sentence-Transformers).
 
-**Главный вопрос:** где проходит граница применимости GAN — на уровне
-эмбеддингов (непрерывное пространство) или на уровне токенов (дискретное)?
-
-**Подход:**
-
-| Уровень | Модель | Чем сравниваем |
-|---------|--------|----------------|
-| Эмбеддинги (768-dim XLM-R) | **WGAN-GP** | Основная модель |
-| Эмбеддинги | **VAE** | Бейзлайн другого семейства |
-| Токены (текст) | **Text-GAN** (Gumbel-Softmax) | Демонстрация ограничений |
-
----
-
-## Структура
-
-```
-gan-reviews/
-├── HANDOFF.md                    ← для AI на новом ПК
-├── README.md
-├── docker-compose.yml
-├── docker/                       Dockerfile для parser и trainer
-├── parser/                       Сбор отзывов с Kaspi.kz
-├── embeddings/                   Извлечение XLM-R эмбеддингов
-├── models/                       WGAN-GP, VAE, Text-GAN
-├── metrics/                      MMD, Frechet Distance
-├── notebooks/                    Точки запуска (Colab-совместимые)
-├── data/                         (gitignored) сырые и обработанные данные
-├── checkpoints/                  (gitignored) сохранённые модели
-├── results/                      графики и таблицы метрик
-└── report/                       отчёт + презентация
-```
-
-Детали — в [HANDOFF.md](HANDOFF.md).
-
----
-
-## Датасет
-
-5000 отзывов с Kaspi.kz, **10 категорий × 500 отзывов**:
-
-1. Смартфоны и аксессуары
-2. Ноутбуки
-3. Крупная бытовая техника
-4. Мелкая бытовая техника
-5. Одежда и обувь
-6. Косметика
-7. Продукты
-8. Детские товары
-9. Спорт
-10. Мебель
-
-Сбор стратифицированный, по 1–5 товаров на категорию. Фильтры: 5–100 слов,
-дедуп по тексту.
-
----
-
-## Модели
-
-### 1. WGAN-GP на эмбеддингах
-
-- **Generator:** MLP, (z=128) + label_emb → 768-dim вектор
-- **Critic:** MLP, 768 + label_emb → scalar
-- **Loss:** Wasserstein + Gradient Penalty (λ=10)
-- **Trick:** LayerNorm в critic (BatchNorm нарушает Lipschitz)
-
-### 2. Conditional VAE
-
-- **Encoder/Decoder:** MLP
-- **Latent:** 64-dim
-- **Loss:** ELBO = reconstruction (MSE) + β·KL
-
-### 3. Text-GAN (TODO)
-
-- **Generator:** маленький Transformer decoder + Gumbel-Softmax
-- **Discriminator:** LSTM или CNN
-- **Loss:** adversarial
-- **Ожидание:** будет генерировать кашу — это часть исследования
-
----
-
-## Метрики
-
-| Метрика | Что показывает |
-|---------|----------------|
-| **MMD** (Maximum Mean Discrepancy) | Близость распределений в пространстве признаков |
-| **Frechet Distance** | Близость через моменты (μ, Σ) — аналог FID |
-| **Per-class MMD/FD** | Где модель работает лучше/хуже |
-| **t-SNE / UMAP** | Визуальное смешивание реальных и сгенерированных точек |
-
----
-
-## Запуск через Docker
-
-Ничего не ставится в систему — всё работает в контейнерах.
-
-### Парсер Kaspi (локально)
-
-1. Заполнить [parser/urls.yaml](parser/urls.yaml) ссылками на товары по 10 категориям.
-2. Собрать образ (первый раз или после правок Dockerfile):
-   ```bash
-   docker compose build parser
-   ```
-3. Запустить сбор:
-   ```bash
-   docker compose run --rm parser
-   ```
-   Результат: `data/raw/reviews.jsonl`, чекпоинт: `data/raw/_checkpoint.json`.
-
-   При обрыве — просто запусти ту же команду, продолжит с чекпоинта.
-
-   Сбросить и начать с нуля:
-   ```bash
-   docker compose run --rm parser python parser/collect.py --reset
-   ```
-
-### Trainer (опционально — для локального Jupyter)
-
+## 5. Инструкция по запуску
+Проект разработан для исполнения в среде **Google Colab**.
+1. Склонируйте репозиторий:
 ```bash
-docker compose build trainer
-docker compose up trainer
+git clone https://github.com/SultanKhassenov/gan-reviews.git
+cd gan-reviews
 ```
+2. Откройте файл `notebooks/03_train_and_compare.ipynb` в Google Colab.
+3. Убедитесь, что у вас подключен Google Drive, а в переменной `EMB_DIR` указан верный путь к вашим `.npy` файлам (или запустите парсер `parser/collect.py` для сбора собственного датасета).
+4. Установите зависимости в первой ячейке 노트북а (или локально через `pip install -r requirements-trainer.txt`).
+5. Запустите все ячейки (Runtime -> Run All).
 
-Открыть http://localhost:8888 (без пароля).
+## 6. Параметры обучения
+- **WGAN-GP:** 200 эпох, Batch Size = 64, Learning Rate = 1e-4. Соотношение обновлений Critic/Generator = 5:1. 
+- **VAE:** 200 эпох, Batch Size = 64, Learning Rate = 1e-3.
+- **Text-GAN:** 50 эпох, Batch Size = 64, Gumbel-Softmax температура $\tau$ = от 1.0 до 0.1.
 
-### Обучение моделей в Colab (рекомендуется)
+## 7. Результаты генерации
+- **MMD (Maximum Mean Discrepancy):** WGAN-GP достиг среднего значения **0.027**, что в 3.5 раза точнее, чем у VAE (0.094).
+- **Отсутствие Mode Collapse:** Доказано равномерное покрытие распределения (по метрикам Density Plot и t-SNE).
+- **Уникальность (No Memorization):** Гистограмма косинусных расстояний показала, что сгенерированные эмбеддинги не копируют обучающую выборку (расстояния в диапазоне 0.15-0.30).
+- Text-GAN полностью провалился на дискретных токенах, уйдя в бесконечное повторение одного токена (Mode Collapse).
 
-1. Запушить репо на GitHub
-2. В Colab: **File → Open notebook → GitHub** → выбрать ноутбук
-3. Запустить ячейки — первая клонирует репо, ставит зависимости
-4. После обучения: **File → Save a copy in GitHub** — outputs попадут в git
-
----
-
-## Workflow
-
-```
-[parser/urls.yaml]
-        │ ручное заполнение ~200–400 URL
-        ▼
-[docker compose run --rm parser]
-        │
-        ▼
-[data/raw/reviews.jsonl]   ← 5000 отзывов
-        │
-        ▼
-[notebooks/01_explore_data.ipynb]   ← EDA: длины, языки, рейтинги
-        │
-        ▼
-[notebooks/02_extract_embeddings.ipynb]   ← XLM-R на T4
-        │
-        ▼
-[data/embeddings/{X_cls,X_mean,labels,ratings}.npy]
-        │
-        ├──► [notebooks/03_train_wgan_gp.ipynb]   → checkpoints/wgan_gp.pth
-        ├──► [notebooks/04_train_vae.ipynb]        → checkpoints/vae.pth
-        └──► [notebooks/06_train_text_gan.ipynb]   → checkpoints/text_gan.pth
-                │
-                ▼
-        [notebooks/05_compare_models.ipynb]   ← MMD, FD, t-SNE
-                │
-                ▼
-        [notebooks/07_final_demo.ipynb]   ← end-to-end для защиты
-                │
-                ▼
-        [report/report.md → report.docx]
-```
-
----
-
-## Параметры обучения (defaults)
-
-| Параметр | Значение | Где задано |
-|----------|----------|-----------|
-| z_dim (WGAN-GP) | 128 | `models/wgan_gp.py` |
-| hidden | 512 | `models/wgan_gp.py`, `models/vae.py` |
-| n_critic | 5 | `models/wgan_gp.py` |
-| lambda_gp | 10.0 | `models/wgan_gp.py` |
-| Adam betas | (0.5, 0.9) | `models/wgan_gp.py` |
-| lr | 1e-4 (GAN) / 1e-3 (VAE) | `models/*.py` |
-| batch_size | 64 | в ноутбуках |
-| n_epochs | 200 (GAN) / 100 (VAE) | в ноутбуках |
-| latent_dim (VAE) | 64 | `models/vae.py` |
-| β (VAE) | 1.0 | `models/vae.py` |
-
----
-
-## Результаты
-
-Будут добавлены после Final-этапа.
-
----
-
-## Лицензия и автор
-
-Sultan Khassenov, магистратура AITU.
+## 8. Скриншоты и графики результатов
+Все графики (Loss-кривые, гистограммы плотности, анализ MMD, t-SNE визуализация) лежат в директории `report/`. Детальный академический отчет находится в файле [report/report.md](report/report.md).
