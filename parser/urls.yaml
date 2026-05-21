@@ -13,7 +13,7 @@
 #   max_review_words: 150
 
 config:
-  per_product_cap: 80
+  per_product_cap: 100
   per_category_target: 500
   min_review_words: 5
   max_review_words: 100
@@ -21,40 +21,71 @@ config:
 categories:
 
   smartphones:
-    - https://kaspi.kz/shop/p/kabel-varium-usb-4-type-c-m-1-m-vtt03-belyi-144182006/
-    - # https://kaspi.kz/shop/p/...
+    - https://kaspi.kz/shop/p/apple-iphone-17-pro-256gb-nanosim-esim-temno-sinii-145438959/?c=632810000
+    - https://kaspi.kz/shop/p/redmi-a5-4-gb-128-gb-chernyi-137034687/?c=632810000
+    - https://kaspi.kz/shop/p/poco-c71-4-gb-128-gb-chernyi-138392445/?c=632810000
+    - https://kaspi.kz/shop/p/samsung-galaxy-a17-8-gb-256-gb-chernyi-146068925/?c=632810000
+    - https://kaspi.kz/shop/p/xiaomi-redmi-note-14-pro-8-gb-256-gb-chernyi-133335702/?c=632810000
 
   laptops:
-    - # https://kaspi.kz/shop/p/...
+    - https://kaspi.kz/shop/p/apple-macbook-air-13-2020-13-3-8-gb-ssd-256-gb-macos-mgn63ru-a-101182724/?c=632810000
+    - https://kaspi.kz/shop/p/mizone-pascal-1060-15-6-16-gb-ssd-512-gb-win-10-mizone-pascal-1060-podarok-139697403/?c=632810000
+    - https://kaspi.kz/shop/p/hydra-home-h20-15-6-12-gb-ssd-512-gb-win-11-mkii-115019992/?c=632810000
+    - https://kaspi.kz/shop/p/lenovo-ideapad-3-15-6-8-gb-ssd-256-gb-dos-15igl05-81wq00errk-102715483/?c=632810000
+    - https://kaspi.kz/shop/p/acer-aspire-3-15-6-celeron-n4500-8-gb-ssd-256-gb-win-11-pro-a325-45-zn-n01si-03k-136300221/?c=632810000
 
   large_appliances:
-    - # холодильники, стиральные машины
-    - # https://kaspi.kz/shop/p/...
+    - https://kaspi.kz/shop/p/leadbros-l-f60172cb-dg-chernyi-156600093/?c=750000000
+    - https://kaspi.kz/shop/p/leadbros-bc-bd-217at-217-l-belyi-105632244/?c=750000000
+    - https://kaspi.kz/shop/p/midea-mo11000gb-chernyi-121355200/?c=750000000
+    - https://kaspi.kz/shop/p/leadbros-srd-341cby1-belyi-145146354/?c=750000000
+    - https://kaspi.kz/shop/p/indesit-ds-4180-w-belyi-2701650/?c=750000000
 
-  small_appliances:
-    - # блендеры, чайники, фены
-    - # https://kaspi.kz/shop/p/...
+  small_appliances:    
+    - https://kaspi.kz/shop/p/el-8l-8-l-chernyi-116751664/?c=750000000
+    - https://kaspi.kz/shop/p/elektrochainik-alicom-k-8-belyi-145108378/?c=750000000
+    - https://kaspi.kz/shop/p/vafel-nitsa-dash-f-607-krasnyi-102531842/?c=750000000
+    - https://kaspi.kz/shop/p/mjasorubka-merlin-mer-m1-serebristyi-156755886/?c=750000000
+    - https://kaspi.kz/shop/p/testomes-ayris-dough-mixer-pro-8000-7-l-bezhevyi-153410465/?c=750000000
 
   clothing:
-    - # одежда, обувь
-    - # https://kaspi.kz/shop/p/...
+    - https://kaspi.kz/shop/p/vechernee-plat-e-chernyi-124567040/?c=750000000
+    - https://kaspi.kz/shop/p/noski-socks-1233210-5-par-belyi-universal-nyi-104285966/?c=750000000
+    - https://kaspi.kz/shop/p/dzhinsy-palatstso-dexoni-temno-sinii-153839579/?c=750000000
+    - https://kaspi.kz/shop/p/noski-limax-lx00111-5-par-chernyi-temno-sinii-seryi-41-44-118707057/?c=750000000
+    - https://kaspi.kz/shop/p/zhilet-chernyi-144446111/?c=750000000
 
   cosmetics:
-    - # кремы, парфюм, уход
-    - # https://kaspi.kz/shop/p/...
+    - https://kaspi.kz/shop/p/dr-plinus-krem-z-cure-cream-mnogofunktsional-nyi-vosstanavlivajuschii-krem-dlja-litsa-80ml-dlja-litsa-80-ml-156917717/?c=750000000
+    - https://kaspi.kz/shop/p/splat-zubnaja-pasta-otbelivanie-pljus-100-ml-100194785/?c=750000000
+    - https://kaspi.kz/shop/p/belita-m-pink-passion-gel-300-ml-118910146/?c=750000000
+    - https://kaspi.kz/shop/p/mary-kay-elige-parfjumernaja-voda-edp-50-ml-dlja-zhenschin-109759761/?c=750000000
+    - https://kaspi.kz/shop/p/luxvisage-gel-brow-laminator-extreme-fix-prozrachnyi-4-ml-121516864/?c=750000000
 
-  food:
-    - # продукты с отзывами (если есть)
-    - # https://kaspi.kz/shop/p/...
+  food:    
+    - https://kaspi.kz/shop/p/magnum-golubika-kitai-125-g-103478382/?c=750000000
+    - https://kaspi.kz/shop/p/maionez-3-zhelanija-provansal-67-700-g-100224012/?c=750000000
+    - https://kaspi.kz/shop/p/pechen-e-bajan-sulu-jubileinoe-102350573/?c=750000000
+    - https://kaspi.kz/shop/p/coca-cola-classic-gazirovannyi-napitok-1-l-100208096/?c=750000000
+    - https://kaspi.kz/shop/p/arnau-ris-barakat-2000-g-104438445/?c=750000000
 
-  kids:
-    - # детские товары, игрушки, коляски
-    - # https://kaspi.kz/shop/p/...
+  kids:    
+    - https://kaspi.kz/shop/p/podguzniki-softcare-s-2-72-sht-144296670/?c=750000000
+    - https://kaspi.kz/shop/p/frutonjanja-klubnika-jabloko-banan-90-g-101048221/?c=750000000
+    - https://kaspi.kz/shop/p/sorter-nabor-razvivajuschih-igrushek-derevo-108447545/?c=750000000
+    - https://kaspi.kz/shop/p/planshet-lcd-planshet-dlja-risovanija-plastik-106688749/?c=750000000
+    - https://kaspi.kz/shop/p/obuchajuschii-nabor-tilashar-plastik-karton-110318230/?c=750000000
 
-  sports:
-    - # велосипеды, тренажёры, экипировка
-    - # https://kaspi.kz/shop/p/...
+  sports:    
+    - https://kaspi.kz/shop/p/kreatin-kevin-levrone-gold-creatine-neitral-nyi-300-g-117800576/?c=750000000
+    - https://kaspi.kz/shop/p/sumka-30209308-511111668-23-chernyi-117523925/?c=750000000
+    - https://kaspi.kz/shop/p/sheiker-nextgen-universal-600-ml-chernyi-142962875/?c=750000000
+    - https://kaspi.kz/shop/p/nabor-gantelei-razbornaja-30-kg-121329589/?c=750000000
+    - https://kaspi.kz/shop/p/kistevoi-5-sht-60-kg-114351261/?c=750000000
 
-  furniture:
-    - # диваны, столы, стулья
-    - # https://kaspi.kz/shop/p/...
+  furniture:    
+    - https://kaspi.kz/shop/p/raspashnoi-shkaf-nur-mebel-545-160x240h52-sm-belyi-116675712/?c=750000000
+    - https://kaspi.kz/shop/p/tv-tumba-napol-naja-loft-180x40x35-sm-belyi-grafit-114282876/?c=750000000
+    - https://kaspi.kz/shop/p/tualetnyi-stolik-mebellion-grand-mix-100x45h75-sm-ldsp-metall-106685276/?c=750000000
+    - https://kaspi.kz/shop/p/veshalka-napol-naja-izox-metall-110x150-sm-chernyi-113366378/?c=750000000
+    - https://kaspi.kz/shop/p/igrovoe-kreslo-501126-chernyi-111098602/?c=750000000

@@ -10,7 +10,7 @@ env/
 *.egg-info/
 
 # Данные (большие файлы, не коммитим)
-data/raw/*.jsonl
+# data/raw/*.jsonl
 data/processed/*.jsonl
 data/processed/*.parquet
 data/embeddings/*.npy

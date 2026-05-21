@@ -166,12 +166,12 @@ def collect(
                 time.sleep(random.uniform(jitter_min, jitter_max))
                 continue
 
-            # Cap на один товар
-            reviews = reviews[:per_product_cap]
-
-            # Фильтр по длине
+            # Фильтр по длине ДО обрезки (ведь парсер скачивает до 300 отзывов)
             before_filter = len(reviews)
             reviews = [r for r in reviews if filter_review(r, min_words, max_words)]
+
+            # Cap на один товар (берём только отфильтрованные)
+            reviews = reviews[:per_product_cap]
 
             # Дедуп по id (внутри сессии и между запусками)
             new_reviews = []
